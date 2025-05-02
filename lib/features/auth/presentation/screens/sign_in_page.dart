@@ -23,9 +23,11 @@ class _SignInPageState extends State<SignInPage> {
 
   void _handleSignIn() {
     if (_formKey.currentState!.validate()) {
-      Navigator.pushNamed(
+      // Navigate to home page and remove all previous routes
+      Navigator.pushNamedAndRemoveUntil(
         context,
-        RouteNames.chooseOption,
+        RouteNames.home,
+        (route) => false,
         arguments: _usernameController.text,
       );
     }

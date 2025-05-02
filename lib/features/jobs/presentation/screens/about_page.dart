@@ -92,7 +92,7 @@ class AboutPage extends StatelessWidget {
             const Text(
               'We are a passionate team of developers, designers, and entrepreneurs '
               'dedicated to creating the best platform for tech professionals and '
-              'businesses to collaborate effectively.',
+              'businesses to collaborate effectively.\n Youssef Mohamed , Mohamed Zaghloul , Mohamed Mahmoud , Mazen Mamdouh , Ahmed Emad ',
               style: TextStyle(
                 fontSize: 16,
                 height: 1.6,
