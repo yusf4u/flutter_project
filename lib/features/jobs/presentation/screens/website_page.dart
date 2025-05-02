@@ -40,7 +40,7 @@ class WebsitesPage extends StatelessWidget {
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.notifications),
+              icon: const Icon(Icons.notifications, color: Colors.white),
               onPressed: () {},
             )
           ],
@@ -136,6 +136,7 @@ class WebsitesPage extends StatelessWidget {
               location: 'United States',
               time: '20 min ago',
               price: 30,
+              skills: ['HTML/CSS', 'JavaScript', 'React', 'E-commerce'],
             ),
             const SizedBox(height: 20),
             _buildJobCard(
@@ -147,6 +148,7 @@ class WebsitesPage extends StatelessWidget {
               location: 'Dubai UAE',
               time: '15 min ago',
               price: 70,
+              skills: ['HTML/CSS', 'JavaScript', 'Angular', 'UI/UX'],
             ),
           ],
         ),
@@ -323,6 +325,7 @@ class WebsitesPage extends StatelessWidget {
     required String location,
     required String time,
     required int price,
+    required List<String> skills,
   }) {
     return Card(
       elevation: 2,
@@ -387,6 +390,16 @@ class WebsitesPage extends StatelessWidget {
                   ],
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: skills.map((skill) => Chip(
+                label: Text(skill),
+                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                labelStyle: const TextStyle(color: Color(0xFF1976D2)),
+              )).toList(),
             ),
             const SizedBox(height: 16),
             Row(

@@ -12,5 +12,6 @@ class RouteNames {
   static const String categoryDetails = '/category-details';
   static const String verifiedAccount = '/verified-account';
   static const String postJob = '/post-job';
-  static const String chatbot = '/chatbot'; // ✅ ثابت معرف بشكل صحيح
+  static const String chatbot = '/chatbot';
+  static const String about = '/about';
 }

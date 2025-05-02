@@ -13,6 +13,23 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<Offset> _slideAnimation;
+  late Animation<Color?> _titleColorAnimation;
+
+  // List of gradient colors for each category
+  final List<List<Color>> _categoryGradients = [
+    [const Color(0xFF004F8C), const Color(0xFF0066B3)],
+    [const Color(0xFF4AC5DE), const Color(0xFF2FB8E6)],
+    [const Color(0xFF6E48AA), const Color(0xFF9D50BB)],
+    [const Color(0xFF4776E6), const Color(0xFF8E54E9)],
+    [const Color(0xFFEB3349), const Color(0xFFF45C43)],
+    [const Color(0xFFFF8008), const Color(0xFFFFC837)],
+    [const Color(0xFF1D976C), const Color(0xFF93F9B9)],
+    [const Color(0xFF614385), const Color(0xFF516395)],
+    [const Color(0xFF16222A), const Color(0xFF3A6073)],
+    [const Color(0xFF1F1C2C), const Color(0xFF928DAB)],
+    [const Color(0xFF1A2980), const Color(0xFF26D0CE)],
+    [const Color(0xFF603813), const Color(0xFFB29F94)],
+  ];
 
   @override
   void initState() {
@@ -20,30 +37,40 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1200),
     );
 
     _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: const Interval(0, 0.5, curve: Curves.easeIn),
+        curve: const Interval(0, 0.6, curve: Curves.easeInOut),
       ),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.95, end: 1).animate(
+    _scaleAnimation = Tween<double>(begin: 0.9, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: const Interval(0.3, 1, curve: Curves.elasticOut),
+        curve: const Interval(0.2, 1, curve: Curves.elasticOut),
       ),
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.1),
+      begin: const Offset(0, 0.15),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Curves.easeOut,
+        curve: Curves.easeOutQuart,
+      ),
+    );
+
+    _titleColorAnimation = ColorTween(
+      begin: const Color(0xFF004F8C).withOpacity(0),
+      end: const Color(0xFF004F8C),
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.5, 1, curve: Curves.easeIn),
       ),
     );
 
@@ -61,7 +88,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Colors.grey[100],
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: AppBar(
@@ -156,6 +183,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 );
               },
             ),
+// In the drawer items section of your home_page.dart
+          _buildDrawerItem(
+           icon: Icons.info,
+            title: 'About',
+     onTap: () {
+    Navigator.pop(context); // Close the drawer
+    Navigator.pushNamed(context, RouteNames.about);
+                 },
+             ),
             const Divider(),
             _buildDrawerItem(
               icon: Icons.settings,
@@ -179,13 +215,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               position: _slideAnimation,
               child: FadeTransition(
                 opacity: _fadeAnimation,
-                child: const Text(
-                  'Explore Jobs',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF004F8C),
-                  ),
+                child: AnimatedBuilder(
+                  animation: _titleColorAnimation,
+                  builder: (context, child) {
+                    return Text(
+                      'Explore Categories',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: _titleColorAnimation.value,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -194,50 +235,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               scale: _scaleAnimation,
               child: FadeTransition(
                 opacity: _fadeAnimation,
-                child: GridView.count(
-                  crossAxisCount: 3,
-                  childAspectRatio: 0.85,
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  children: _jobCategories.map((item) {
-                    return _buildCategoryCard(item);
-                  }).toList(),
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
-            FadeTransition(
-              opacity: _fadeAnimation,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
+                child: Column(
+                  children: List.generate(_jobCategories.length, (index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: _buildFullWidthCategoryCard(
+                        _jobCategories[index], 
+                        _categoryGradients[index % _categoryGradients.length]
                       ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Image.asset('assets/images/Logo.png', width: 80, height: 80),
-                      Row(
-                        children: [
-                          _buildSocialButton('assets/images/instagram.png'),
-                          const SizedBox(width: 8),
-                          _buildSocialButton('assets/images/facebook.png'),
-                        ],
-                      ),
-                    ],
-                  ),
+                    );
+                  }),
                 ),
               ),
             ),
@@ -307,7 +314,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildCategoryCard(Map<String, String> item) {
+  Widget _buildFullWidthCategoryCard(Map<String, String> item, List<Color> gradientColors) {
     return GestureDetector(
       onTap: () {
         if (item['name'] == 'Websites') {
@@ -335,59 +342,88 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               child: child,
             );
           },
-          child: Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
+          child: Container(
+            height: 120,
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF004F8C), Color(0xFF4AC5DE)],
-                ),
-                borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: gradientColors,
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    item['icon']!,
-                    width: 48,
-                    height: 48,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    item['name']!,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  right: 20,
+                  top: 20,
+                  child: Opacity(
+                    opacity: 0.2,
+                    child: Image.asset(
+                      item['icon']!,
+                      width: 80,
+                      height: 80,
                       color: Colors.white,
                     ),
                   ),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Image.asset(
+                            item['icon']!,
+                            width: 30,
+                            height: 30,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item['name']!,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Tap to explore',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSocialButton(String imagePath) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(30),
-      onTap: () {},
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.grey[200],
-        ),
-        child: Image.asset(imagePath, width: 24, height: 24),
       ),
     );
   }
@@ -398,12 +434,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     {'name': 'AI Specialist', 'icon': 'assets/images/ai.png'},
     {'name': 'Game development', 'icon': 'assets/images/games.png'},
     {'name': 'Software development', 'icon': 'assets/images/software.png'},
-    {'name': 'Support & Cybersecurity', 'icon': 'assets/images/cybersecurity.png'},
+    {'name': 'Cybersecurity', 'icon': 'assets/images/cybersecurity.png'},
     {'name': 'API/Backend', 'icon': 'assets/images/api.png'},
-    {'name': 'Embedded system', 'icon': 'assets/images/embeddedsystem.png'},
+    {'name': 'Embedded', 'icon': 'assets/images/embeddedsystem.png'},
     {'name': 'IT', 'icon': 'assets/images/it.png'},
-    {'name': 'E-commerce development', 'icon': 'assets/images/ecommerce.png'},
+    {'name': 'E-commerce', 'icon': 'assets/images/ecommerce.png'},
     {'name': 'Data Science', 'icon': 'assets/images/datascience.png'},
-    {'name': 'System Testing', 'icon': 'assets/images/systemtesting.png'},
+    {'name': 'Testing', 'icon': 'assets/images/systemtesting.png'},
   ];
 }

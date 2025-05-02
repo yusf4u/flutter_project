@@ -15,7 +15,6 @@ class _VerifiedAccountClientState extends State<VerifiedAccountClient>
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
-  late Animation<double> _logoScaleAnimation;
 
   @override
   void initState() {
@@ -48,13 +47,6 @@ class _VerifiedAccountClientState extends State<VerifiedAccountClient>
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
-      ),
-    );
-
-    _logoScaleAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.7, 1.0, curve: Curves.easeInOut),
       ),
     );
 
@@ -175,17 +167,6 @@ class _VerifiedAccountClientState extends State<VerifiedAccountClient>
                       ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 50),
-              
-              // Logo with delayed scale animation
-              ScaleTransition(
-                scale: _logoScaleAnimation,
-                child: Image.asset(
-                  'assets/images/Logo.png',
-                  width: 100,
-                  height: 100,
                 ),
               ),
             ],

@@ -14,6 +14,7 @@ import 'features/home/presentation/screens/home_page.dart';
 import 'features/jobs/presentation/screens/website_page.dart';
 import 'features/jobs/presentation/screens/category_details.dart';
 import 'features/shared/models/profile_args.dart';
+import 'features/jobs/presentation/screens/about_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -56,7 +57,7 @@ class MyApp extends StatelessWidget {
             );
           } else if (args is String) {
             return ProfileSettingPage(
-              profileArgs: profileArgs(fullName: args),
+              profileArgs: ProfileArgs(fullName: args, role: 'developer'),
             );
           }
           return const ProfileSettingPage();
@@ -66,6 +67,7 @@ class MyApp extends StatelessWidget {
         RouteNames.categoryDetails: (context) => CategoryDetailsPage(
           category: ModalRoute.of(context)!.settings.arguments as String,
         ),
+        RouteNames.about: (context) => const AboutPage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == RouteNames.verifiedAccount) {
@@ -83,6 +85,6 @@ class MyApp extends StatelessWidget {
       },
     );
   }
+}
   
   profileArgs({required String fullName}) {}
-}

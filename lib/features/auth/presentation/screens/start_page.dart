@@ -9,9 +9,11 @@ class StartPage extends StatefulWidget {
 
 class _StartPageState extends State<StartPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _logoAnimation;
-  late Animation<double> _titleAnimation;
-  late final List<Animation<double>> _featureAnimations = [];
+  late Animation<double> _logoScale;
+  late Animation<double> _titleFade;
+  late Animation<Offset> _titleSlide;
+  late final List<Animation<double>> _featureFades = [];
+  late final List<Animation<Offset>> _featureSlides = [];
 
   @override
   void initState() {
@@ -19,36 +21,64 @@ class _StartPageState extends State<StartPage> with SingleTickerProviderStateMix
     
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1800),
     );
 
-    // Logo animation - slides down from top
-    _logoAnimation = Tween<double>(begin: -100, end: 0).animate(
+    // Logo animation - scales up with bounce
+// Logo animation - scales up with bounce
+_logoScale = TweenSequence<double>([
+  TweenSequenceItem(tween: Tween(begin: 0.5, end: 1.2), weight: 50), // Overshoot
+  TweenSequenceItem(tween: Tween(begin: 1.2, end: 1.0), weight: 50), // Settle
+]).animate(
+  CurvedAnimation(
+    parent: _controller,
+    curve: const Interval(0.0, 0.4, curve: Curves.easeOutBack),
+  ),
+);
+
+    // Title animations
+    _titleFade = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.3, curve: Curves.easeOut),
+        curve: const Interval(0.4, 0.6, curve: Curves.easeIn),
+      ),
+    );
+    _titleSlide = Tween<Offset>(
+      begin: const Offset(0, 0.5),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.4, 0.7, curve: Curves.easeOutQuad),
       ),
     );
 
-    // Title animation - fades in
-    _titleAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.3, 0.5, curve: Curves.easeIn),
-      ),
-    );
-
-    // Feature items animations - staggered
+    // Feature animations - staggered
     const featureCount = 5;
     for (int i = 0; i < featureCount; i++) {
-      _featureAnimations.add(
+      _featureFades.add(
         Tween<double>(begin: 0, end: 1).animate(
           CurvedAnimation(
             parent: _controller,
             curve: Interval(
-              0.5 + (i * 0.1),
-              0.7 + (i * 0.1),
+              0.6 + (i * 0.08),
+              0.8 + (i * 0.08),
               curve: Curves.easeIn,
+            ),
+          ),
+        ),
+      );
+      _featureSlides.add(
+        Tween<Offset>(
+          begin: const Offset(-0.5, 0),
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: Interval(
+              0.6 + (i * 0.08),
+              0.9 + (i * 0.08),
+              curve: Curves.easeOutBack,
             ),
           ),
         ),
@@ -68,64 +98,93 @@ class _StartPageState extends State<StartPage> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Animated Logo
-              AnimatedBuilder(
-                animation: _logoAnimation,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(0, _logoAnimation.value),
-                    child: Opacity(
-                      opacity: _controller.value >= 0.3 ? 1.0 : 0.0,
-                      child: child,
-                    ),
-                  );
-                },
-                child: Image.asset(
-                  'assets/images/Logo.png',
-                  width: 120,
-                  height: 120,
-                ),
-              ),
-              const SizedBox(height: 30),
-              
-              // Animated Title
-              AnimatedBuilder(
-                animation: _titleAnimation,
-                builder: (context, child) {
-                  return Opacity(
-                    opacity: _titleAnimation.value,
-                    child: Transform.translate(
-                      offset: Offset(0, 20 * (1 - _titleAnimation.value)),
-                      child: child,
-                    ),
-                  );
-                },
-                child: const Text(
-                  'Your platform for running your freelance business\neasily and professionally.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    height: 1.4,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.white, Color(0xFFE6F7FD)],
+            stops: [0.3, 1.0],
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Animated Logo with glow effect
+                AnimatedBuilder(
+                  animation: _logoScale,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _logoScale.value,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            if (_controller.value > 0.3)
+                              BoxShadow(
+                                color: const Color(0xFF4AC5DE).withOpacity(0.2 * _controller.value),
+                                blurRadius: 20,
+                                spreadRadius: 2,
+                              ),
+                          ],
+                        ),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: Image.asset(
+                    'assets/images/Logo.png',
+                    width: 150,
+                    height: 150,
                   ),
                 ),
-              ),
-              const SizedBox(height: 40),
-              
-              // Animated Feature List
-              _buildFeatureList(),
-              const SizedBox(height: 50),
-              
-              // Buttons (no animation)
-              _buildAuthButtons(context),
-            ],
+                const SizedBox(height: 30),
+                
+                // Animated Title with subtle parallax
+                AnimatedBuilder(
+                  animation: Listenable.merge([_titleFade, _titleSlide]),
+                  builder: (context, child) {
+                    return Opacity(
+                      opacity: _titleFade.value,
+                      child: Transform.translate(
+                        offset: _titleSlide.value * 50,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: const TextSpan(
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        height: 1.4,
+                        color: Color(0xFF004F8C),
+                      ),
+children: [
+  TextSpan(text: 'Your Platform for\n'),
+  TextSpan(
+    text: 'Freelance Excellence',
+    style: TextStyle(
+      color: Color(0xFF4AC5DE),
+    ),
+  ),
+],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                
+                // Animated Feature List with polished icons
+                _buildFeatureList(),
+                const SizedBox(height: 50),
+                
+                // Buttons with ripple animation
+                _buildAuthButtons(context),
+              ],
+            ),
           ),
         ),
       ),
@@ -133,12 +192,37 @@ class _StartPageState extends State<StartPage> with SingleTickerProviderStateMix
   }
 
   Widget _buildFeatureList() {
-    const features = [
-      'Manage projects easily.',
-      'Access to the best value for money.',
-      'Ease of communication between client and developer.',
-      'Your privacy and data security are our priorities.',
-      'Free up your time and focus on creativity – we take care of the rest.',
+    final features = [
+      _FeatureItem(
+        icon: Icons.rocket_launch_rounded,
+        color: const Color(0xFF6E48AA),
+        title: 'Project Management',
+        description: 'Manage projects with our intuitive dashboard',
+      ),
+      _FeatureItem(
+        icon: Icons.attach_money_rounded,
+        color: const Color(0xFF1D976C),
+        title: 'Competitive Pricing',
+        description: 'Get the best value for your budget',
+      ),
+      _FeatureItem(
+        icon: Icons.chat_bubble_rounded,
+        color: const Color(0xFFEB3349),
+        title: 'Seamless Communication',
+        description: 'Built-in chat and collaboration tools',
+      ),
+      _FeatureItem(
+        icon: Icons.security_rounded,
+        color: const Color(0xFFFF8008),
+        title: 'Data Protection',
+        description: 'Enterprise-grade security for your projects',
+      ),
+      _FeatureItem(
+        icon: Icons.auto_awesome_rounded,
+        color: const Color(0xFF4776E6),
+        title: 'Focus on Creativity',
+        description: 'We handle the logistics - you create',
+      ),
     ];
 
     return Column(
@@ -147,36 +231,66 @@ class _StartPageState extends State<StartPage> with SingleTickerProviderStateMix
         final feature = entry.value;
         
         return AnimatedBuilder(
-          animation: _featureAnimations[index],
+          animation: Listenable.merge([_featureFades[index], _featureSlides[index]]),
           builder: (context, child) {
             return Opacity(
-              opacity: _featureAnimations[index].value,
+              opacity: _featureFades[index].value,
               child: Transform.translate(
-                offset: Offset(20 * (1 - _featureAnimations[index].value), 0),
+                offset: _featureSlides[index].value * 100,
                 child: child,
               ),
             );
           },
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0, right: 12.0),
-                  child: Icon(Icons.check_circle, color: Colors.cyan[600], size: 20),
-                ),
-                Expanded(
-                  child: Text(
-                    feature,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                      height: 1.5,
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            child: Material(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              elevation: _controller.value > 0.6 + (index * 0.08) ? 2 : 0,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: feature.color.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        feature.icon,
+                        color: feature.color,
+                        size: 20,
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            feature.title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          Text(
+                            feature.description,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[700],
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         );
@@ -185,23 +299,66 @@ class _StartPageState extends State<StartPage> with SingleTickerProviderStateMix
   }
 
   Widget _buildAuthButtons(BuildContext context) {
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/signin');
-            },
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Color(0xFF4AC5DE)),
-              backgroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+        // Sign Up Button with gradient
+        Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF4AC5DE), Color(0xFF004F8C)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF4AC5DE).withOpacity(0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: ElevatedButton(
+            onPressed: () => Navigator.pushNamed(context, '/signup'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              padding: const EdgeInsets.symmetric(vertical: 18),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(30),
               ),
             ),
-            child: const Text(
-              'Sign In',
+            child: const SizedBox(
+              width: double.infinity,
+              child: Text(
+                'Get Started - Sign Up Free',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Sign In Button
+        OutlinedButton(
+          onPressed: () => Navigator.pushNamed(context, '/signin'),
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(color: Color(0xFF4AC5DE)),
+            backgroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          child: const SizedBox(
+            width: double.infinity,
+            child: Text(
+              'I Have An Account - Sign In',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: Color(0xFF4AC5DE),
                 fontSize: 16,
@@ -210,30 +367,33 @@ class _StartPageState extends State<StartPage> with SingleTickerProviderStateMix
             ),
           ),
         ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/signup');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4AC5DE),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text(
-              'Sign Up',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+        const SizedBox(height: 24),
+        // Guest Option
+        TextButton(
+          onPressed: () {},
+          child: const Text(
+            'Continue as Guest',
+            style: TextStyle(
+              color: Color(0xFF004F8C),
+              decoration: TextDecoration.underline,
             ),
           ),
         ),
       ],
     );
   }
+}
+
+class _FeatureItem {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String description;
+
+  _FeatureItem({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.description,
+  });
 }

@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
 import 'package:DevLance/core/constants/route_names.dart';
 import 'package:DevLance/features/shared/models/profile_args.dart';
-
 
 class ProfileSettingPage extends StatefulWidget {
   final ProfileArgs? profileArgs;
@@ -15,15 +18,81 @@ class ProfileSettingPage extends StatefulWidget {
 class _ProfileSettingPageState extends State<ProfileSettingPage> {
   late List<String> skills;
   late List<String> jobHistory;
+  File? _profileImage;
   final TextEditingController skillController = TextEditingController();
   final TextEditingController jobController = TextEditingController();
   double accountBalance = 1250.50;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
     skills = widget.profileArgs?.skills ?? ['Flutter', 'Dart', 'UI/UX'];
     jobHistory = widget.profileArgs?.jobHistory ?? ['Senior Developer at TechCo (2020-2023)'];
+    _loadProfileImage();
+  }
+
+  Future<void> _loadProfileImage() async {
+    if (widget.profileArgs?.imagePath != null) {
+      final file = File(widget.profileArgs!.imagePath!);
+      if (await file.exists()) {
+        setState(() {
+          _profileImage = file;
+        });
+      }
+    }
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(source: source);
+      if (pickedFile != null) {
+        final appDir = await getApplicationDocumentsDirectory();
+        final fileName = 'profile_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        final savedImage = await File(pickedFile.path).copy('${appDir.path}/$fileName');
+        
+        setState(() {
+          _profileImage = savedImage;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context as BuildContext).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
+    }
+  }
+
+  void _showImagePickerOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: Color(0xFF4AC5DE)),
+                title: const Text('Take Photo'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: Color(0xFF4AC5DE)),
+                title: const Text('Choose from Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -33,50 +102,52 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     super.dispose();
   }
 
-  void _addSkill() {
+  void _addSkill(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Skill', style: TextStyle(color: Color(0xFF4AC5DE))),
-        content: TextField(
-          controller: skillController,
-          decoration: InputDecoration(
-            hintText: 'Enter your skill',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF4AC5DE)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF4AC5DE), width: 2),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4AC5DE),
-              shape: RoundedRectangleBorder(
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add Skill', style: TextStyle(color: Color(0xFF4AC5DE))),
+          content: TextField(
+            controller: skillController,
+            decoration: InputDecoration(
+              hintText: 'Enter your skill',
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFF4AC5DE)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFF4AC5DE), width: 2),
               ),
             ),
-            onPressed: () {
-              if (skillController.text.trim().isNotEmpty) {
-                setState(() {
-                  skills.add(skillController.text.trim());
-                  skillController.clear();
-                });
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Add', style: TextStyle(color: Colors.white)),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4AC5DE),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () {
+                if (skillController.text.trim().isNotEmpty) {
+                  setState(() {
+                    skills.add(skillController.text.trim());
+                    skillController.clear();
+                  });
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Add', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -84,50 +155,52 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     setState(() => skills.removeAt(index));
   }
 
-  void _addJobHistory() {
+  void _addJobHistory(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Job History', style: TextStyle(color: Color(0xFF4AC5DE))),
-        content: TextField(
-          controller: jobController,
-          decoration: InputDecoration(
-            hintText: 'Enter job history',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF4AC5DE)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF4AC5DE), width: 2),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4AC5DE),
-              shape: RoundedRectangleBorder(
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add Job History', style: TextStyle(color: Color(0xFF4AC5DE))),
+          content: TextField(
+            controller: jobController,
+            decoration: InputDecoration(
+              hintText: 'Enter job history',
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFF4AC5DE)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFF4AC5DE), width: 2),
               ),
             ),
-            onPressed: () {
-              if (jobController.text.trim().isNotEmpty) {
-                setState(() {
-                  jobHistory.add(jobController.text.trim());
-                  jobController.clear();
-                });
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Add', style: TextStyle(color: Colors.white)),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4AC5DE),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () {
+                if (jobController.text.trim().isNotEmpty) {
+                  setState(() {
+                    jobHistory.add(jobController.text.trim());
+                    jobController.clear();
+                  });
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Add', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -135,7 +208,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
     setState(() => jobHistory.removeAt(index));
   }
 
-  void _navigateToEditProfile() {
+  void _navigateToEditProfile(BuildContext context) {
     if (widget.profileArgs?.role == 'developer') {
       Navigator.pushNamed(
         context,
@@ -148,24 +221,27 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
           role: 'developer',
           skills: skills,
           jobHistory: jobHistory,
+          imagePath: _profileImage?.path,
         ),
       );
     }
   }
 
-  void _withdrawFunds() {
+  void _withdrawFunds(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Withdraw Funds', style: TextStyle(color: Color(0xFF4AC5DE))),
-        content: const Text('Withdrawal functionality will be implemented here'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK', style: TextStyle(color: Color(0xFF4AC5DE))),
-          ),
-        ],
-      ),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Withdraw Funds', style: TextStyle(color: Color(0xFF4AC5DE))),
+          content: const Text('Withdrawal functionality will be implemented here'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK', style: TextStyle(color: Color(0xFF4AC5DE))),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -178,7 +254,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit, color: Color(0xFF4AC5DE)),
-            onPressed: _navigateToEditProfile,
+            onPressed: () => _navigateToEditProfile(context),
           ),
         ],
       ),
@@ -203,51 +279,61 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
               ),
               child: Column(
                 children: [
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: const Color(0xFF4AC5DE).withOpacity(0.3),
-                            width: 2,
-                          ),
-                        ),
-                        child: ClipOval(
-                          child: widget.profileArgs?.imagePath != null
-                              ? Image.network(
-                                  widget.profileArgs!.imagePath!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => 
-                                      const Icon(Icons.person, size: 50, color: Color(0xFF4AC5DE)),
-                                )
-                              : const Icon(Icons.person, size: 50, color: Color(0xFF4AC5DE)),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
+                  GestureDetector(
+                    onTap: () => _showImagePickerOptions(context),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 120,
+                          height: 120,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4AC5DE),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white,
+                              color: const Color(0xFF4AC5DE).withOpacity(0.3),
                               width: 2,
                             ),
                           ),
-                          child: const Icon(
-                            Icons.camera_alt,
-                            size: 20,
-                            color: Colors.white,
+                          child: ClipOval(
+                            child: _profileImage != null
+                                ? Image.file(
+                                    _profileImage!,
+                                    fit: BoxFit.cover,
+                                    width: 120,
+                                    height: 120,
+                                  )
+                                : widget.profileArgs?.imagePath != null
+                                    ? Image.network(
+                                        widget.profileArgs!.imagePath!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => 
+                                            const Icon(Icons.person, size: 50, color: Color(0xFF4AC5DE)),
+                                      )
+                                    : const Icon(Icons.person, size: 50, color: Color(0xFF4AC5DE)),
                           ),
                         ),
-                      ),
-                    ],
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF4AC5DE),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 2,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              size: 20,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Text(
@@ -345,7 +431,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                       const Spacer(),
                       IconButton(
                         icon: const Icon(Icons.add_circle, color: Color(0xFF4AC5DE)),
-                        onPressed: _addSkill,
+                        onPressed: () => _addSkill(context),
                       ),
                     ],
                   ),
@@ -406,7 +492,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                       const Spacer(),
                       IconButton(
                         icon: const Icon(Icons.add_circle, color: Color(0xFF4AC5DE)),
-                        onPressed: _addJobHistory,
+                        onPressed: () => _addJobHistory(context),
                       ),
                     ],
                   ),
@@ -505,7 +591,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _withdrawFunds,
+                      onPressed: () => _withdrawFunds(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF4AC5DE),
                         padding: const EdgeInsets.symmetric(vertical: 16),
