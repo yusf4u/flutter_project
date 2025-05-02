@@ -24,10 +24,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     [const Color(0xFFEB3349), const Color(0xFFF45C43)],
     [const Color(0xFFFF8008), const Color(0xFFFFC837)],
     [const Color(0xFF1D976C), const Color(0xFF93F9B9)],
+    [const Color(0xFF1A2980), const Color(0xFF26D0CE)],
     [const Color(0xFF614385), const Color(0xFF516395)],
     [const Color(0xFF16222A), const Color(0xFF3A6073)],
     [const Color(0xFF1F1C2C), const Color(0xFF928DAB)],
-    [const Color(0xFF1A2980), const Color(0xFF26D0CE)],
     [const Color(0xFF603813), const Color(0xFFB29F94)],
   ];
 
@@ -183,15 +183,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 );
               },
             ),
-// In the drawer items section of your home_page.dart
-          _buildDrawerItem(
-           icon: Icons.info,
-            title: 'About',
-     onTap: () {
-    Navigator.pop(context); // Close the drawer
-    Navigator.pushNamed(context, RouteNames.about);
-                 },
-             ),
+            _buildDrawerItem(
+              icon: Icons.info,
+              title: 'About',
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, RouteNames.about);
+              },
+            ),
             const Divider(),
             _buildDrawerItem(
               icon: Icons.settings,
@@ -202,6 +201,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               icon: Icons.help,
               title: 'Help & Support',
               onTap: () {},
+            ),
+            const Divider(),
+            _buildDrawerItem(
+              icon: Icons.logout,
+              title: 'Logout',
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  RouteNames.start, // Replace with your actual start page route name
+                  (route) => false, // This removes all routes from the stack
+                );
+              },
             ),
           ],
         ),
@@ -281,6 +293,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   icon: Icon(Icons.person),
                   label: 'Profile',
                 ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.logout),
+                  label: 'Logout',
+                ),
               ],
               onTap: (index) {
                 if (index == 1) {
@@ -289,6 +305,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     context,
                     RouteNames.profileSetting,
                     arguments: args is String ? args : null,
+                  );
+                } else if (index == 2) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    RouteNames.start,
+                    (route) => false,
                   );
                 }
               },
@@ -432,14 +454,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     {'name': 'Websites', 'icon': 'assets/images/website.png'},
     {'name': 'Applications', 'icon': 'assets/images/mobile.png'},
     {'name': 'AI Specialist', 'icon': 'assets/images/ai.png'},
-    {'name': 'Game development', 'icon': 'assets/images/games.png'},
-    {'name': 'Software development', 'icon': 'assets/images/software.png'},
+    {'name': 'UI / UX', 'icon': 'assets/images/UIUX.png'},
+    {'name': 'Software \nDevelopment', 'icon': 'assets/images/systemtesting.png'},
+    {'name': 'IT', 'icon': 'assets/images/it.png'},
+    {'name': 'E-Commerce', 'icon': 'assets/images/ecommerce.png'},
+    {'name': 'Game \nDevelopment', 'icon': 'assets/images/games.png'},
+    {'name': 'Embedded', 'icon': 'assets/images/embeddedsystem.png'},
     {'name': 'Cybersecurity', 'icon': 'assets/images/cybersecurity.png'},
     {'name': 'API/Backend', 'icon': 'assets/images/api.png'},
-    {'name': 'Embedded', 'icon': 'assets/images/embeddedsystem.png'},
-    {'name': 'IT', 'icon': 'assets/images/it.png'},
-    {'name': 'E-commerce', 'icon': 'assets/images/ecommerce.png'},
     {'name': 'Data Science', 'icon': 'assets/images/datascience.png'},
-    {'name': 'Testing', 'icon': 'assets/images/systemtesting.png'},
   ];
 }

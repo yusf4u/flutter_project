@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:DevLance/features/jobs/presentation/screens/job_details.dart';
+import 'package:DevLance/core/constants/route_names.dart';
 
 class WebsitesPage extends StatelessWidget {
   const WebsitesPage({super.key});
@@ -50,27 +51,75 @@ class WebsitesPage extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Color(0xFF004F8C)),
-              child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
+            Container(
+              height: 160,
+              decoration: const BoxDecoration(
+                color: Color(0xFF004F8C),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+              ),
+              child: const Center(
+                child: Text(
+                  'Menu',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home'),
+            _buildDrawerItem(
+              icon: Icons.home,
+              title: 'Home',
               onTap: () {
                 Navigator.pop(context);
-                Navigator.pushReplacementNamed(context, '/home');
+                Navigator.pushReplacementNamed(context, RouteNames.home);
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Profile'),
+            _buildDrawerItem(
+              icon: Icons.person,
+              title: 'Profile',
               onTap: () {
                 final args = ModalRoute.of(context)?.settings.arguments;
                 Navigator.pushNamed(
                   context,
-                  '/profile-setting',
+                  RouteNames.profileSetting,
                   arguments: args is String ? args : null,
+                );
+              },
+            ),
+            _buildDrawerItem(
+              icon: Icons.info,
+              title: 'About',
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, RouteNames.about);
+              },
+            ),
+            const Divider(),
+            _buildDrawerItem(
+              icon: Icons.settings,
+              title: 'Settings',
+              onTap: () {},
+            ),
+            _buildDrawerItem(
+              icon: Icons.help,
+              title: 'Help & Support',
+              onTap: () {},
+            ),
+            const Divider(),
+            _buildDrawerItem(
+              icon: Icons.logout,
+              title: 'Logout',
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  RouteNames.start,
+                  (route) => false,
                 );
               },
             ),
@@ -155,6 +204,11 @@ class WebsitesPage extends StatelessWidget {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
+        selectedItemColor: const Color(0xFF004F8C),
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        backgroundColor: Colors.white,
+        elevation: 10,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -164,18 +218,43 @@ class WebsitesPage extends StatelessWidget {
             icon: Icon(Icons.person),
             label: 'Profile',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.logout),
+            label: 'Logout',
+          ),
         ],
         onTap: (index) {
           if (index == 1) {
             final args = ModalRoute.of(context)?.settings.arguments;
             Navigator.pushNamed(
               context,
-              '/profile-setting',
+              RouteNames.profileSetting,
               arguments: args is String ? args : null,
+            );
+          } else if (index == 2) {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              RouteNames.start,
+              (route) => false,
             );
           }
         },
       ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: const Color(0xFF004F8C)),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w500),
+      ),
+      onTap: onTap,
     );
   }
 
