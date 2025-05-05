@@ -25,16 +25,15 @@ class _StartPageState extends State<StartPage> with SingleTickerProviderStateMix
     );
 
     // Logo animation - scales up with bounce
-// Logo animation - scales up with bounce
-_logoScale = TweenSequence<double>([
-  TweenSequenceItem(tween: Tween(begin: 0.5, end: 1.2), weight: 50), // Overshoot
-  TweenSequenceItem(tween: Tween(begin: 1.2, end: 1.0), weight: 50), // Settle
-]).animate(
-  CurvedAnimation(
-    parent: _controller,
-    curve: const Interval(0.0, 0.4, curve: Curves.easeOutBack),
-  ),
-);
+    _logoScale = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.5, end: 1.2), weight: 50), // Overshoot
+      TweenSequenceItem(tween: Tween(begin: 1.2, end: 1.0), weight: 50), // Settle
+    ]).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.4, curve: Curves.easeOutBack),
+      ),
+    );
 
     // Title animations
     _titleFade = Tween<double>(begin: 0, end: 1).animate(
@@ -163,15 +162,15 @@ _logoScale = TweenSequence<double>([
                         height: 1.4,
                         color: Color(0xFF004F8C),
                       ),
-children: [
-  TextSpan(text: 'Your Platform for\n'),
-  TextSpan(
-    text: 'Freelance Excellence',
-    style: TextStyle(
-      color: Color(0xFF4AC5DE),
-    ),
-  ),
-],
+                      children: [
+                        TextSpan(text: 'Your Platform for\n'),
+                        TextSpan(
+                          text: 'Freelance Excellence',
+                          style: TextStyle(
+                            color: Color(0xFF4AC5DE),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -364,18 +363,6 @@ children: [
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        // Guest Option
-        TextButton(
-          onPressed: () {},
-          child: const Text(
-            'Continue as Guest',
-            style: TextStyle(
-              color: Color(0xFF004F8C),
-              decoration: TextDecoration.underline,
             ),
           ),
         ),
