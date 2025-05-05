@@ -2,8 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:DevLance/features/jobs/presentation/screens/job_details.dart';
 import 'package:DevLance/core/constants/route_names.dart';
 
-class WebsitesPage extends StatelessWidget {
+class WebsitesPage extends StatefulWidget {
   const WebsitesPage({super.key});
+
+  @override
+  State<WebsitesPage> createState() => _WebsitesPageState();
+}
+
+class _WebsitesPageState extends State<WebsitesPage> {
+  // List to store all jobs
+  final List<Map<String, dynamic>> _jobs = [
+    {
+      'title': 'Website for clothes page',
+      'description': 'I want to create a modern and user-friendly website for my clothing brand. The website should showcase our latest collections, include an e-commerce functionality, and have a blog section for fashion tips.',
+      'rating': 4.7,
+      'location': 'United States',
+      'time': '20 min ago',
+      'price': 30,
+      'skills': ['HTML/CSS', 'JavaScript', 'React', 'E-commerce'],
+    },
+    {
+      'title': 'Website for Shopping Mall',
+      'description': 'I want a modern, user-friendly website for my shopping mall that includes store directories, promotions, events calendar, and interactive mall map. The design should be elegant and easy to navigate.',
+      'rating': 4.4,
+      'location': 'Dubai UAE',
+      'time': '15 min ago',
+      'price': 70,
+      'skills': ['HTML/CSS', 'JavaScript', 'Angular', 'UI/UX'],
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +46,7 @@ class WebsitesPage extends StatelessWidget {
               image: DecorationImage(
                 image: AssetImage('assets/images/theme.png'),
                 fit: BoxFit.cover,
-              ),
-            ),
+              )),
           ),
           toolbarHeight: 80,
           elevation: 0,
@@ -176,29 +202,22 @@ class WebsitesPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-            _buildJobCard(
-              context: context,
-              title: 'Website for clothes page',
-              description:
-                  'I want to create a modern and user-friendly website for my clothing brand. The website should showcase our latest collections, include an e-commerce functionality, and have a blog section for fashion tips.',
-              rating: 4.7,
-              location: 'United States',
-              time: '20 min ago',
-              price: 30,
-              skills: ['HTML/CSS', 'JavaScript', 'React', 'E-commerce'],
-            ),
-            const SizedBox(height: 20),
-            _buildJobCard(
-              context: context,
-              title: 'Website for Shopping Mall',
-              description:
-                  'I want a modern, user-friendly website for my shopping mall that includes store directories, promotions, events calendar, and interactive mall map. The design should be elegant and easy to navigate.',
-              rating: 4.4,
-              location: 'Dubai UAE',
-              time: '15 min ago',
-              price: 70,
-              skills: ['HTML/CSS', 'JavaScript', 'Angular', 'UI/UX'],
-            ),
+            // Display all jobs from the list
+            ..._jobs.map((job) => Column(
+              children: [
+                _buildJobCard(
+                  context: context,
+                  title: job['title'],
+                  description: job['description'],
+                  rating: job['rating'],
+                  location: job['location'],
+                  time: job['time'],
+                  price: job['price'],
+                  skills: List<String>.from(job['skills']),
+                ),
+                const SizedBox(height: 20),
+              ],
+            )),
           ],
         ),
       ),
@@ -264,13 +283,16 @@ class WebsitesPage extends StatelessWidget {
     final detailsController = TextEditingController();
     final deadlineController = TextEditingController();
     final budgetController = TextEditingController();
+    final skillController = TextEditingController();
+    List<String> skills = [];
 
     bool isFormValid() {
       return titleController.text.isNotEmpty &&
           descriptionController.text.isNotEmpty &&
           detailsController.text.isNotEmpty &&
           deadlineController.text.isNotEmpty &&
-          budgetController.text.isNotEmpty;
+          budgetController.text.isNotEmpty &&
+          skills.isNotEmpty;
     }
 
     showDialog(
@@ -340,6 +362,60 @@ class WebsitesPage extends StatelessWidget {
                       ),
                       keyboardType: TextInputType.number,
                     ),
+                    const SizedBox(height: 16),
+                    // Skills Section
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Required Skills',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: skillController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Add skill',
+                                  border: OutlineInputBorder(),
+                                  hintText: 'Enter skill and press +',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: () {
+                                if (skillController.text.isNotEmpty) {
+                                  setState(() {
+                                    skills.add(skillController.text);
+                                    skillController.clear();
+                                  });
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        if (skills.isNotEmpty)
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 4,
+                            children: skills.map((skill) => Chip(
+                              label: Text(skill),
+                              backgroundColor: const Color(0xFFE3F2FD),
+                              deleteIcon: const Icon(Icons.close, size: 16),
+                              onDeleted: () {
+                                setState(() {
+                                  skills.remove(skill);
+                                });
+                              },
+                            )).toList(),
+                          ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -353,6 +429,19 @@ class WebsitesPage extends StatelessWidget {
                 ElevatedButton(
                   onPressed: isFormValid()
                       ? () {
+                          // Add the new job to the list
+                          setState(() {
+                            _jobs.insert(0, {
+                              'title': titleController.text,
+                              'description': descriptionController.text,
+                              'rating': 0.0, // New job has no rating yet
+                              'location': 'Cairo,Egypt', // Default location
+                              'time': 'Just now',
+                              'price': int.tryParse(budgetController.text) ?? 0,
+                              'skills': List<String>.from(skills),
+                            });
+                          });
+                          
                           Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Job posted successfully!')),
@@ -476,7 +565,7 @@ class WebsitesPage extends StatelessWidget {
               runSpacing: 8,
               children: skills.map((skill) => Chip(
                 label: Text(skill),
-                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                backgroundColor: const Color(0xFFE3F2FD),
                 labelStyle: const TextStyle(color: Color(0xFF1976D2)),
               )).toList(),
             ),
@@ -510,6 +599,9 @@ class WebsitesPage extends StatelessWidget {
                           rating: rating,
                           location: location,
                           price: price,
+                          time: time,
+                          skills: skills,
+                          title: '',
                         ),
                       ),
                     );

@@ -13,7 +13,7 @@ class JobDetailsPage extends StatefulWidget {
     required this.description,
     required this.rating,
     required this.location,
-    required this.price,
+    required this.price, required String title, required String time, required List<String> skills,
   });
 
   @override
