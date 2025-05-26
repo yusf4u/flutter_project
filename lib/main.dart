@@ -7,7 +7,7 @@ import 'views/auth/choose_option_page.dart';
 import 'views/auth/verified_account_developer.dart';
 import 'views/auth/verified_account_client.dart';
 import 'features/developer/presentation/screens/developer_info_page.dart';
-import 'features/client/presentation/screens/client_info_page.dart';
+import 'views/client/client_info_page.dart';
 import 'views/bank/bank_account_page.dart';
 import 'features/profile/presentation/screens/profile_setting_page.dart';
 import 'features/home/presentation/screens/home_page.dart';
