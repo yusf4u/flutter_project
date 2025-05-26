@@ -4,10 +4,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:DevLance/core/constants/route_names.dart';
-import 'package:DevLance/features/shared/models/profile_args.dart';
+import 'package:DevLance/models/user_profile.dart';
 
 class ProfileSettingPage extends StatefulWidget {
-  final ProfileArgs? profileArgs;
+  final UserProfile? profileArgs;
   
   const ProfileSettingPage({super.key, this.profileArgs});
 
@@ -213,7 +213,7 @@ class _ProfileSettingPageState extends State<ProfileSettingPage> {
       Navigator.pushNamed(
         context,
         RouteNames.developerInfo,
-        arguments: ProfileArgs(
+        arguments: UserProfile(
           fullName: widget.profileArgs?.fullName ?? '',
           bio: widget.profileArgs?.bio ?? '',
           degreeOrCompany: widget.profileArgs?.degreeOrCompany ?? '',

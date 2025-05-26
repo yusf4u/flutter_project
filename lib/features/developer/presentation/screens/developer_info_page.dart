@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:DevLance/core/constants/route_names.dart';
-import '../../../shared/models/profile_args.dart';
+import '../../../../models/user_profile.dart';
 
 class DeveloperInfoPage extends StatefulWidget {
   const DeveloperInfoPage({super.key, String? username});
@@ -237,7 +237,7 @@ class _DeveloperInfoPageState extends State<DeveloperInfoPage> {
                           Navigator.pushNamed(
                             context,
                             RouteNames.bankAccount,
-                            arguments: ProfileArgs(
+                            arguments: UserProfile(
                               fullName: _nameController.text,
                               bio: _bioController.text,
                               degreeOrCompany: _degreeController.text,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:DevLance/core/constants/route_names.dart';
-import 'package:DevLance/features/shared/models/profile_args.dart';
+import 'package:DevLance/models/user_profile.dart';
 
 class ClientInfoPage extends StatefulWidget {
   const ClientInfoPage({super.key, String? username});  // Removed username parameter
@@ -174,7 +174,7 @@ class _ClientInfoPageState extends State<ClientInfoPage> {
                           Navigator.pushNamed(
                             context,
                             RouteNames.bankAccount,
-                            arguments: ProfileArgs(
+                            arguments: UserProfile(
                               fullName: _nameController.text,
                               bio: _bioController.text,
                               degreeOrCompany: _companyController.text,

@@ -13,7 +13,7 @@ import 'views/jobs/profile_setting_page.dart';
 import 'views/home/home_page.dart';
 import 'features/jobs/presentation/screens/website_page.dart';
 import 'features/jobs/presentation/screens/category_details.dart';
-import 'features/shared/models/profile_args.dart';
+import 'models/user_profile.dart';
 import 'features/jobs/presentation/screens/about_page.dart';
 
 void main() {
@@ -47,18 +47,18 @@ class MyApp extends StatelessWidget {
         RouteNames.bankAccount: (context) {
           final args = ModalRoute.of(context)?.settings.arguments;
           return BankAccountPage(
-            profileArgs: args is ProfileArgs ? args : null,
+            profileArgs: args is UserProfile ? args : null,
           );
         },
         RouteNames.profileSetting: (context) {
           final args = ModalRoute.of(context)?.settings.arguments;
-          if (args is ProfileArgs) {
+          if (args is UserProfile) {
             return ProfileSettingPage(
               profileArgs: args,
             );
           } else if (args is String) {
             return ProfileSettingPage(
-              profileArgs: ProfileArgs(fullName: args, role: 'developer'),
+              profileArgs: UserProfile(fullName: args, role: 'developer'),
             );
           }
           return const ProfileSettingPage();
@@ -87,5 +87,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-  
-  profileArgs({required String fullName}) {}

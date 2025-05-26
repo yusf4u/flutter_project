@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../features/shared/models/profile_args.dart';
+import '../../models/user_profile.dart';
 
 // Bank Account Page
 class BankAccountPage extends StatefulWidget {
-  final ProfileArgs? profileArgs;
+  final UserProfile? profileArgs;
   
   const BankAccountPage({super.key, this.profileArgs});
 
