@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'core/constants/route_names.dart';
-import 'features/auth/presentation/screens/start_page.dart';
-import 'features/auth/presentation/screens/sign_in_page.dart';
-import 'features/auth/presentation/screens/sign_up_page.dart';
-import 'features/auth/presentation/screens/choose_option_page.dart';
-import 'features/auth/presentation/screens/verified_account_developer.dart';
-import 'features/auth/presentation/screens/verified_account_client.dart';
+import 'views/auth/start_page.dart';
+import 'views/auth/sign_in_page.dart';
+import 'views/auth/sign_up_page.dart';
+import 'views/auth/choose_option_page.dart';
+import 'views/auth/verified_account_developer.dart';
+import 'views/auth/verified_account_client.dart';
 import 'features/developer/presentation/screens/developer_info_page.dart';
 import 'features/client/presentation/screens/client_info_page.dart';
 import 'features/bank/presentation/screens/bank_account_page.dart';
