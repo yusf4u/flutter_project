@@ -9,7 +9,7 @@ import 'views/auth/verified_account_client.dart';
 import 'features/developer/presentation/screens/developer_info_page.dart';
 import 'views/client/client_info_page.dart';
 import 'views/bank/bank_account_page.dart';
-import 'features/profile/presentation/screens/profile_setting_page.dart';
+import 'views/jobs/profile_setting_page.dart';
 import 'views/home/home_page.dart';
 import 'features/jobs/presentation/screens/website_page.dart';
 import 'features/jobs/presentation/screens/category_details.dart';
