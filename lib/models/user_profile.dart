@@ -1,5 +1,4 @@
-// features/shared/models/profile_args.dart
-class ProfileArgs {
+class UserProfile {
   
   final String fullName;
   final String? bio;
@@ -11,7 +10,7 @@ class ProfileArgs {
   final List<String>? jobHistory;
   final String? imagePath;
 
-  const ProfileArgs({
+  const UserProfile({
     required this.fullName,
     this.bio,
     this.degreeOrCompany,
@@ -24,7 +23,7 @@ class ProfileArgs {
   });
 
   // Add a copyWith method for easy updates
-  ProfileArgs copyWith({
+  UserProfile copyWith({
     String? fullName,
     String? bio,
     String? degreeOrCompany,
@@ -35,7 +34,7 @@ class ProfileArgs {
     List<String>? jobHistory,
     String? imagePath,
   }) {
-    return ProfileArgs(
+    return UserProfile(
       fullName: fullName ?? this.fullName,
       bio: bio ?? this.bio,
       degreeOrCompany: degreeOrCompany ?? this.degreeOrCompany,
