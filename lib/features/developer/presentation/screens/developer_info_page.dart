@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:DevLance/core/constants/route_names.dart';
-import 'package:DevLance/features/shared/models/profile_args.dart';
+import '../../../shared/models/profile_args.dart';
 
 class DeveloperInfoPage extends StatefulWidget {
   const DeveloperInfoPage({super.key, String? username});

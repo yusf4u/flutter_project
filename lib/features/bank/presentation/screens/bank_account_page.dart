@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:DevLance/features/shared/models/profile_args.dart';
+import '../../../shared/models/profile_args.dart';
 
 // Bank Account Page
 class BankAccountPage extends StatefulWidget {
