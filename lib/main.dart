@@ -11,10 +11,10 @@ import 'views/client/client_info_page.dart';
 import 'views/bank/bank_account_page.dart';
 import 'views/jobs/profile_setting_page.dart';
 import 'views/home/home_page.dart';
-import 'features/jobs/presentation/screens/website_page.dart';
-import 'features/jobs/presentation/screens/category_details.dart';
+import 'views/jobs/website_page.dart';
+import 'views/jobs/category_details.dart';
 import 'models/user_profile.dart';
-import 'features/jobs/presentation/screens/about_page.dart';
+import 'views/jobs/about_page.dart';
 
 void main() {
   runApp(const MyApp());

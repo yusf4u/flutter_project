@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:DevLance/features/jobs/presentation/screens/job_details.dart';
+import 'package:DevLance/views/jobs/job_details.dart';
 import 'package:DevLance/core/constants/route_names.dart';
 
 class WebsitesPage extends StatefulWidget {
